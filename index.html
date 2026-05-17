@@ -632,7 +632,12 @@
         ctx.fillRect(0, 0, 32, 32);
         ctx.drawImage(img, 4, 4, 24, 24);
         ctx.restore();
-        document.getElementById('favicon').href = canvas.toDataURL('image/png');
+        document.querySelectorAll("link[rel*='icon']").forEach(l => l.remove());
+        const link = document.createElement('link');
+        link.rel = 'icon';
+        link.type = 'image/png';
+        link.href = canvas.toDataURL('image/png');
+        document.head.appendChild(link);
       };
       img.src = 'data:image/png;base64,' + starB64;
     })();
