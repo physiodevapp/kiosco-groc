@@ -42,10 +42,10 @@ function guardarRespuesta(datos) {
       throw new Error('El valor GROC debe ser un entero entre -7 y 7.');
     }
 
-    // ── 4. Validación básica del ID de proceso ───────────────
-    // Admite letras, números, guiones y espacios; mínimo 2 caracteres.
-    if (!/^[\w\s\-]{2,50}$/i.test(idProceso)) {
-      throw new Error('El ID de proceso contiene caracteres no permitidos o es demasiado corto/largo.');
+    // ── 4. Validación del ID de proceso ─────────────────────
+    // Formato fijo: A seguido de exactamente 6 dígitos.
+    if (!/^A\d{6}$/.test(idProceso)) {
+      throw new Error('El ID de proceso debe tener el formato A seguido de 6 dígitos (ej. A000001).');
     }
 
     // ── 5. Etiquetas (claves como strings para evitar ambigüedad) ──
