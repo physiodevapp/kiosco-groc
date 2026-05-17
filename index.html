@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+  <style>
+    /* ── Variables de marca ── */
+    :root {
+      --brand-50:  #F7F8F3;
+      --brand-100: #DBE5ED;
+      --brand-200: #9AADCA;
+      --brand-500: #475A8E;
+      --brand-600: #202A60;
+      --brand-700: #16205A;
+    }
+
+    .btn-brand {
+      background-color: var(--brand-600);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-brand:hover  { background-color: var(--brand-700); transform: translateY(-1px); }
+    .btn-brand:active { transform: scale(0.96); background-color: var(--brand-700); }
+    .btn-brand:disabled { cursor: not-allowed; }
+
+    .text-brand     { color: var(--brand-600); }
+    .bg-brand-light { background-color: var(--brand-100); }
+    .border-brand   { border-color: var(--brand-500); }
+    .shadow-brand   { box-shadow: 0 10px 25px rgba(32,42,96,0.25); }
+
+    /* Kiosco */
+    * { -webkit-user-select: none; user-select: none; }
+    input, textarea { -webkit-user-select: text; user-select: text; }
+
+    html, body {
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
+      overscroll-behavior: none;
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+    @media (min-width: 640px) { body { padding: 1rem 1.5rem; } }
+
+    .card-wrapper {
+      width: 100%;
+      max-width: 36rem;
+      max-height: 100dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 1.5rem;
+    }
+
+    /* ── Slider táctil ── */
+    input[type=range] {
+      height: 32px;
+      -webkit-appearance: none;
+      width: 100%;
+      border-radius: 20px;
+      background: transparent;
+    }
+    input[type=range]:focus { outline: none; }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%; height: 12px;
+      cursor: pointer;
+      background: #E5E7EB;
+      border-radius: 10px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 28px; width: 28px;
+      border-radius: 50%;
+      background: var(--brand-600);
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -8px;
+      box-shadow: 0 4px 12px rgba(32,42,96,0.4);
+      transition: transform 0.1s;
+    }
+    input[type=range]:active::-webkit-slider-thumb { transform: scale(1.2); }
+
+    @media (display-mode: standalone) {
+      body { padding-top: env(safe-area-inset-top); }
+    }
+
+    body > div[style*="padding-top"],
+    body > div[style*="margin-top"] { display: none !important; }
+
+    /* ── Modal personalizado ── */
+    #custom-modal {
+      position: fixed; inset: 0;
+      background: rgba(15, 23, 60, 0.45);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 999;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    #custom-modal.visible { opacity: 1; pointer-events: all; }
+    #custom-modal .modal-box {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 2rem 1.75rem 1.5rem;
+      max-width: 22rem; width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(32,42,96,0.3);
+      transform: scale(0.92);
+      transition: transform 0.2s ease;
+    }
+    #custom-modal.visible .modal-box { transform: scale(1); }
+
+    /* ── Aviso "slider sin mover" ── */
+    #aviso-slider {
+      transition: opacity 0.3s ease;
+    }
+    #aviso-slider.oculto { opacity: 0; pointer-events: none; }
+
+    /* ── Track coloreado dinámicamente ── */
+    #valorGroc {
+      --pct: 50%;   /* valor inicial: 0 → (0+7)/14 = 50% */
+    }
+    /* Estado neutro (0) */
+    #valorGroc.neutro::-webkit-slider-runnable-track  { background: linear-gradient(to right, #E5E7EB var(--pct), #E5E7EB var(--pct)); }
+    /* Estado positivo */
+    #valorGroc.positivo::-webkit-slider-runnable-track { background: linear-gradient(to right, #16a34a var(--pct), #E5E7EB var(--pct)); }
+    /* Estado negativo — llenamos desde la derecha */
+    #valorGroc.negativo::-webkit-slider-runnable-track { background: linear-gradient(to right, #E5E7EB var(--pct), #dc2626 var(--pct)); }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-100 to-blue-50">
+
+  <!-- MODAL DE ERROR -->
+  <div id="custom-modal">
+    <div class="modal-box">
+      <div class="flex justify-center mb-3">
+        <div id="modal-icon-wrap" class="w-14 h-14 rounded-full flex items-center justify-center">
+          <!-- El icono se inyecta por JS según el tipo -->
+        </div>
+      </div>
+      <p id="modal-msg" class="text-slate-700 text-sm font-medium mb-5 leading-relaxed"></p>
+      <button onclick="cerrarModal()"
+        class="btn-brand w-full text-white font-bold py-3 rounded-2xl text-sm">
+        Aceptar
+      </button>
+    </div>
+  </div>
+
+  <!-- CARD PRINCIPAL -->
+  <div class="card-wrapper">
+    <div class="bg-white shadow-2xl rounded-3xl w-full max-w-xl animate__animated animate__fadeIn">
+
+      <!-- FORMULARIO -->
+      <div id="form-content" class="p-4 sm:p-7">
+
+        <!-- Header -->
+        <div class="text-center mb-3 sm:mb-5">
+          <div class="flex justify-center mb-2 sm:mb-4">
+            <img
+              src="https://www.clinicauniversitarialasalle.es/wp-content/uploads/2024/08/la-salle.png"
+              alt="Clínica Universitaria La Salle"
+              class="h-10 sm:h-16 w-auto object-contain"
+              loading="eager"
+            >
+          </div>
+          <h1 class="text-xl sm:text-3xl font-bold text-slate-800">Valoración de Mejora</h1>
+          <p class="text-slate-400 text-xs sm:text-base mt-0.5">Escala Global de Cambio (GROC)</p>
+        </div>
+
+        <!-- Inputs -->
+        <div class="grid grid-cols-2 gap-3 mb-3 sm:mb-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Fecha de alta</label>
+            <input type="date" id="fechaFin"
+              class="w-full p-3 bg-slate-50 border-2 border-slate-100 rounded-2xl border-brand focus:bg-white outline-none transition-all text-slate-700 text-sm sm:text-base">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">
+              ID Proceso
+              <span class="normal-case font-normal text-slate-400">(letras, números, guion)</span>
+            </label>
+            <input type="text" id="idProceso"
+              placeholder="Ej: REHAB-001"
+              maxlength="50"
+              pattern="[\w\s\-]+"
+              class="w-full p-3 bg-slate-50 border-2 border-slate-100 rounded-2xl border-brand focus:bg-white outline-none transition-all text-slate-700 text-sm sm:text-base">
+          </div>
+        </div>
+
+        <!-- Escala GROC -->
+        <div class="bg-slate-50 rounded-2xl p-3 sm:p-5 mb-3 sm:mb-4">
+          <p class="text-center text-xs sm:text-base font-medium text-slate-600 mb-2 sm:mb-5 leading-snug">
+            Comparado con el <strong>inicio del tratamiento</strong>,<br>¿cómo se encuentra hoy?
+          </p>
+
+          <!-- Valor actual -->
+          <div id="labelDisplay"
+            class="text-center text-base sm:text-2xl font-bold text-brand mb-2 sm:mb-5 min-h-6">
+            Sin cambios (0)
+          </div>
+
+          <!-- Aviso si el slider no se ha movido -->
+          <div id="aviso-slider"
+            class="oculto text-center text-xs font-semibold text-amber-500 mb-2 flex items-center justify-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            </svg>
+            Mueve el slider para confirmar que el valor es correcto
+          </div>
+
+          <!-- Slider -->
+          <input type="range" id="valorGroc" min="-7" max="7" value="0" step="1"
+            oninput="updateLabel(this.value)" class="mb-2 cursor-pointer neutro">
+
+          <!-- Extremos — línea central posicionada al 50% exacto -->
+          <div style="position:relative; display:flex; justify-content:space-between; font-size:0.75rem; font-weight:700; padding: 0 0.25rem;">
+            <span style="color:#f87171;">😞 Mucho peor</span>
+            <span style="color:#22c55e;">Mucho mejor 😊</span>
+            <!-- Línea vertical anclada al 50% del contenedor, alineada con el thumb en 0 -->
+            <span style="position:absolute; left:50%; transform:translateX(-50%); color:#cbd5e1; font-weight:400; pointer-events:none;">|</span>
+          </div>
+
+          <!-- Escala numérica — 15 columnas iguales, una por cada stop del slider -->
+          <div style="display:grid;grid-template-columns:repeat(15,1fr);font-size:0.7rem;color:#CBD5E1;margin-top:0.25rem;text-align:center;">
+            <span>-7</span>
+            <span></span><span></span><span></span>
+            <span>-3</span>
+            <span></span><span></span>
+            <span style="color:#94a3b8;font-weight:600;">0</span>
+            <span></span><span></span>
+            <span>+3</span>
+            <span></span><span></span><span></span>
+            <span>+7</span>
+          </div>
+        </div>
+
+        <!-- Indicador de estado del envío -->
+        <div id="status-bar" class="hidden mb-3 text-center text-xs font-medium text-slate-400 flex items-center justify-center gap-2">
+          <svg class="animate-spin h-4 w-4 text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+          </svg>
+          <span id="status-msg">Guardando…</span>
+        </div>
+
+        <!-- Botón Enviar -->
+        <button onclick="enviarDatos()" id="btnEnviar"
+          class="btn-brand shadow-brand w-full text-white font-bold py-4 sm:py-5 rounded-2xl text-base sm:text-lg">
+          GUARDAR VALORACIÓN
+        </button>
+
+        <!-- Aviso privacidad -->
+        <p class="text-center text-xs text-slate-300 mt-2 sm:mt-4">
+          Los datos se registran de forma anónima con fines clínicos.
+        </p>
+      </div>
+
+      <!-- PANTALLA ÉXITO -->
+      <div id="success-content" class="hidden p-6 sm:p-10 text-center">
+        <div class="animate__animated animate__zoomIn">
+          <div class="bg-green-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <h2 class="text-3xl font-bold text-slate-800 mb-2">¡Gracias!</h2>
+          <p class="text-slate-500 text-base mb-2">Su valoración ha sido registrada correctamente.</p>
+          <p class="text-slate-400 text-sm">
+            La pantalla se reiniciará en
+            <span id="countdown" class="font-bold text-brand">5</span> segundos…
+          </p>
+          <div class="mt-6 bg-slate-100 rounded-full h-2 overflow-hidden">
+            <div id="progressBar"
+              class="h-2 bg-brand-light rounded-full transition-all duration-1000"
+              style="width:100%">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ── Etiquetas GROC ──────────────────────────────────────────
+    const etiquetas = {
+      "7":  "Muchísimo mejor (+7)",
+      "6":  "Mucho mejor (+6)",
+      "5":  "Moderadamente mejor (+5)",
+      "4":  "Algo mejor (+4)",
+      "3":  "Un poco mejor (+3)",
+      "2":  "Casi igual, un poco mejor (+2)",
+      "1":  "Casi igual, mínimamente mejor (+1)",
+      "0":  "Sin cambios (0)",
+      "-1": "Casi igual, mínimamente peor (-1)",
+      "-2": "Casi igual, un poco peor (-2)",
+      "-3": "Un poco peor (-3)",
+      "-4": "Algo peor (-4)",
+      "-5": "Moderadamente peor (-5)",
+      "-6": "Mucho peor (-6)",
+      "-7": "Muchísimo peor (-7)"
+    };
+
+    // ── Estado del slider ───────────────────────────────────────
+    let sliderMovido = false;
+    let timeoutEnvio = null;
+
+    // ── updateLabel ─────────────────────────────────────────────
+    function updateLabel(val) {
+      val = parseInt(val, 10);
+      sliderMovido = true;
+
+      // Oculta el aviso si lo había
+      document.getElementById('aviso-slider').classList.add('oculto');
+
+      const display = document.getElementById('labelDisplay');
+      display.innerText = etiquetas[String(val)];
+
+      const slider = document.getElementById('valorGroc');
+
+      // Porcentaje para el track coloreado
+      const pct = ((val + 7) / 14 * 100).toFixed(1) + '%';
+      slider.style.setProperty('--pct', pct);
+
+      if (val > 0) {
+        display.style.color = '#16a34a';
+        slider.className = 'mb-2 cursor-pointer positivo';
+      } else if (val < 0) {
+        display.style.color = '#dc2626';
+        slider.className = 'mb-2 cursor-pointer negativo';
+      } else {
+        display.style.color = 'var(--brand-600)';
+        slider.className = 'mb-2 cursor-pointer neutro';
+      }
+    }
+
+    // ── enviarDatos ─────────────────────────────────────────────
+    function enviarDatos() {
+      const idProceso = document.getElementById('idProceso').value.trim();
+      const fechaFin  = document.getElementById('fechaFin').value;
+
+      // Validaciones en cliente
+      if (!idProceso || !fechaFin) {
+        mostrarModal('Por favor, rellene el ID del proceso y la fecha de alta.', 'error');
+        return;
+      }
+
+      if (!/^[\w\s\-]{2,50}$/i.test(idProceso)) {
+        mostrarModal('El ID de proceso solo puede contener letras, números, espacios y guiones (2-50 caracteres).', 'error');
+        return;
+      }
+
+      // Aviso si el slider no se ha movido (valor 0 sin interacción)
+      if (!sliderMovido) {
+        document.getElementById('aviso-slider').classList.remove('oculto');
+        // Permite continuar tras confirmación: mostramos modal
+        mostrarModal(
+          'El slider está en 0 (Sin cambios). ¿Es correcto? Si es así, pulsa "Aceptar" y luego "Guardar" de nuevo.',
+          'aviso'
+        );
+        sliderMovido = true; // la segunda vez ya no avisa
+        return;
+      }
+
+      bloquearUI(true);
+
+      // ── Timeout de seguridad: 15 s ──────────────────────────
+      timeoutEnvio = setTimeout(() => {
+        mostrarModal('La conexión está tardando demasiado. Comprueba la red e inténtalo de nuevo.', 'error');
+        bloquearUI(false);
+      }, 15000);
+
+      google.script.run
+        .withSuccessHandler((resp) => {
+          clearTimeout(timeoutEnvio);
+          if (resp && resp.success) {
+            mostrarExito();
+          } else {
+            mostrarModal('No se pudo guardar. ' + (resp?.error || 'Error desconocido'), 'error');
+            bloquearUI(false);
+          }
+        })
+        .withFailureHandler((err) => {
+          clearTimeout(timeoutEnvio);
+          mostrarModal('Error de comunicación: ' + err.message, 'error');
+          bloquearUI(false);
+        })
+        .guardarRespuesta({
+          fechaFin,
+          idProceso,
+          valorGroc: document.getElementById('valorGroc').value
+        });
+    }
+
+    // ── bloquearUI ──────────────────────────────────────────────
+    function bloquearUI(bloqueado) {
+      const btn       = document.getElementById('btnEnviar');
+      const statusBar = document.getElementById('status-bar');
+
+      if (bloqueado) {
+        btn.disabled = true;
+        btn.innerText = 'GUARDANDO…';
+        btn.classList.add('opacity-50');
+        statusBar.classList.remove('hidden');
+        statusBar.classList.add('flex');
+        document.getElementById('status-msg').innerText = 'Guardando valoración…';
+      } else {
+        btn.disabled = false;
+        btn.innerText = 'GUARDAR VALORACIÓN';
+        btn.classList.remove('opacity-50');
+        statusBar.classList.add('hidden');
+        statusBar.classList.remove('flex');
+      }
+    }
+
+    // ── mostrarExito ────────────────────────────────────────────
+    function mostrarExito() {
+      document.getElementById('form-content').classList.add('hidden');
+      document.getElementById('success-content').classList.remove('hidden');
+
+      let segundos = 5;
+      const countdownEl = document.getElementById('countdown');
+      const progressBar = document.getElementById('progressBar');
+
+      const intervalo = setInterval(() => {
+        segundos--;
+        countdownEl.innerText = segundos;
+        progressBar.style.width = (segundos / 5 * 100) + '%';
+        if (segundos <= 0) clearInterval(intervalo);
+      }, 1000);
+
+      setTimeout(() => {
+        resetFormulario();
+      }, 5000);
+    }
+
+    // ── resetFormulario ─────────────────────────────────────────
+    function resetFormulario() {
+      document.getElementById('form-content').classList.remove('hidden');
+      document.getElementById('success-content').classList.add('hidden');
+
+      document.getElementById('idProceso').value = '';
+      document.getElementById('fechaFin').valueAsDate = new Date();
+      document.getElementById('valorGroc').value = 0;
+      sliderMovido = false;
+
+      document.getElementById('aviso-slider').classList.add('oculto');
+      document.getElementById('status-bar').classList.add('hidden');
+      document.getElementById('status-bar').classList.remove('flex');
+      updateLabel(0);
+      bloquearUI(false);
+    }
+
+    // ── Modal (tipo: 'error' | 'aviso') ─────────────────────────
+    function mostrarModal(msg, tipo = 'error') {
+      document.getElementById('modal-msg').innerText = msg;
+
+      const wrap = document.getElementById('modal-icon-wrap');
+      if (tipo === 'aviso') {
+        wrap.className = 'bg-amber-100 w-14 h-14 rounded-full flex items-center justify-center';
+        wrap.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+              d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          </svg>`;
+      } else {
+        wrap.className = 'bg-red-100 w-14 h-14 rounded-full flex items-center justify-center';
+        wrap.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+              d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          </svg>`;
+      }
+
+      document.getElementById('custom-modal').classList.add('visible');
+    }
+
+    function cerrarModal() {
+      document.getElementById('custom-modal').classList.remove('visible');
+    }
+
+    // ── Inicio ──────────────────────────────────────────────────
+    window.onload = () => {
+      document.getElementById('fechaFin').valueAsDate = new Date();
+      updateLabel(0);
+      sliderMovido = false; // garantiza el estado inicial aunque updateLabel lo ponga a true
+    };
+  </script>
+</body>
+</html>
