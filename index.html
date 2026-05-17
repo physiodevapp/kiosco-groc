@@ -22,9 +22,9 @@
       transition: all 0.2s ease;
       cursor: pointer;
     }
-    .btn-brand:hover  { background-color: var(--brand-700); transform: translateY(-1px); }
-    .btn-brand:active { transform: scale(0.96); background-color: var(--brand-700); }
-    .btn-brand:disabled { cursor: not-allowed; }
+    .btn-brand:hover    { background-color: var(--brand-700); transform: translateY(-1px); }
+    .btn-brand:active   { transform: scale(0.96); background-color: var(--brand-700); }
+    .btn-brand:disabled { cursor: not-allowed; opacity: 0.35; transform: none; }
 
     .text-brand     { color: var(--brand-600); }
     .bg-brand-light { background-color: var(--brand-100); }
@@ -33,7 +33,6 @@
 
     /* Kiosco */
     * { -webkit-user-select: none; user-select: none; }
-    input, textarea { -webkit-user-select: text; user-select: text; }
 
     html, body {
       margin: 0; padding: 0;
@@ -92,7 +91,7 @@
     body > div[style*="padding-top"],
     body > div[style*="margin-top"] { display: none !important; }
 
-    /* ── Modal personalizado ── */
+    /* ── Modal ── */
     #custom-modal {
       position: fixed; inset: 0;
       background: rgba(15, 23, 60, 0.45);
@@ -115,34 +114,58 @@
     }
     #custom-modal.visible .modal-box { transform: scale(1); }
 
-    /* ── Aviso "slider sin mover" ── */
-    #aviso-slider {
-      transition: opacity 0.3s ease;
-    }
+    /* ── Aviso slider ── */
+    #aviso-slider { transition: opacity 0.3s ease; }
     #aviso-slider.oculto { opacity: 0; pointer-events: none; }
 
     /* ── Track coloreado dinámicamente ── */
-    #valorGroc {
-      --pct: 50%;   /* valor inicial: 0 → (0+7)/14 = 50% */
+    #valorGroc { --pct: 50%; }
+    #valorGroc.neutro::-webkit-slider-runnable-track    { background: #E5E7EB; }
+    #valorGroc.positivo::-webkit-slider-runnable-track  { background: linear-gradient(to right, #E5E7EB 50%, #16a34a 50%, #16a34a var(--pct), #E5E7EB var(--pct)); }
+    #valorGroc.negativo::-webkit-slider-runnable-track  { background: linear-gradient(to right, #E5E7EB var(--pct), #dc2626 var(--pct), #dc2626 50%, #E5E7EB 50%); }
+
+    /* ── Teclado numérico ── */
+    .numpad-btn {
+      background: #F8FAFC;
+      border: 2px solid #E2E8F0;
+      border-radius: 1rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--brand-600);
+      transition: all 0.1s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 64px;
     }
-    /* Estado neutro (0) */
-    #valorGroc.neutro::-webkit-slider-runnable-track  { background: linear-gradient(to right, #E5E7EB var(--pct), #E5E7EB var(--pct)); }
-    /* Estado positivo — verde desde el centro (50%) hasta el thumb */
-    #valorGroc.positivo::-webkit-slider-runnable-track { background: linear-gradient(to right, #E5E7EB 50%, #16a34a 50%, #16a34a var(--pct), #E5E7EB var(--pct)); }
-    /* Estado negativo — rojo desde el thumb hasta el centro (50%) */
-    #valorGroc.negativo::-webkit-slider-runnable-track { background: linear-gradient(to right, #E5E7EB var(--pct), #dc2626 var(--pct), #dc2626 50%, #E5E7EB 50%); }
+    .numpad-btn:active { background: var(--brand-100); transform: scale(0.94); border-color: var(--brand-500); }
+
+    /* ── Slots del ID ── */
+    .id-slot {
+      width: 2.5rem;
+      height: 3rem;
+      border-bottom: 3px solid #CBD5E1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--brand-600);
+      transition: border-color 0.15s;
+    }
+    .id-slot.activo { border-color: var(--brand-600); }
+    .id-slot.lleno  { border-color: var(--brand-500); color: var(--brand-600); }
   </style>
 </head>
 
 <body class="bg-gradient-to-br from-slate-100 to-blue-50">
 
-  <!-- MODAL DE ERROR -->
+  <!-- MODAL -->
   <div id="custom-modal">
     <div class="modal-box">
       <div class="flex justify-center mb-3">
-        <div id="modal-icon-wrap" class="w-14 h-14 rounded-full flex items-center justify-center">
-          <!-- El icono se inyecta por JS según el tipo -->
-        </div>
+        <div id="modal-icon-wrap" class="w-14 h-14 rounded-full flex items-center justify-center"></div>
       </div>
       <p id="modal-msg" class="text-slate-700 text-sm font-medium mb-5 leading-relaxed"></p>
       <button onclick="cerrarModal()"
@@ -152,15 +175,68 @@
     </div>
   </div>
 
-  <!-- CARD PRINCIPAL -->
   <div class="card-wrapper">
     <div class="bg-white shadow-2xl rounded-3xl w-full max-w-xl animate__animated animate__fadeIn">
 
-      <!-- FORMULARIO -->
-      <div id="form-content" class="p-4 sm:p-7">
+      <!-- ── PANTALLA 1: FISIO ── -->
+      <div id="fisio-screen" class="p-4 sm:p-7">
 
-        <!-- Header -->
-        <div class="text-center mb-3 sm:mb-5">
+        <div class="text-center mb-4 sm:mb-6">
+          <div class="flex justify-center mb-2 sm:mb-3">
+            <img
+              src="https://www.clinicauniversitarialasalle.es/wp-content/uploads/2024/08/la-salle.png"
+              alt="Clínica Universitaria La Salle"
+              class="h-10 sm:h-14 w-auto object-contain"
+              loading="eager"
+            >
+          </div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">Terapeuta</p>
+          <h1 class="text-lg sm:text-2xl font-bold text-slate-800">Introduce el ID del proceso</h1>
+        </div>
+
+        <!-- Display ID -->
+        <div class="flex items-end justify-center gap-2 mb-6 sm:mb-8">
+          <span class="text-4xl font-black text-brand pb-1">A</span>
+          <div class="flex gap-2">
+            <div class="id-slot activo" id="slot-0"></div>
+            <div class="id-slot" id="slot-1"></div>
+            <div class="id-slot" id="slot-2"></div>
+            <div class="id-slot" id="slot-3"></div>
+            <div class="id-slot" id="slot-4"></div>
+            <div class="id-slot" id="slot-5"></div>
+          </div>
+        </div>
+
+        <!-- Numpad -->
+        <div class="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
+          <button class="numpad-btn" onclick="pulsarDigito('1')">1</button>
+          <button class="numpad-btn" onclick="pulsarDigito('2')">2</button>
+          <button class="numpad-btn" onclick="pulsarDigito('3')">3</button>
+          <button class="numpad-btn" onclick="pulsarDigito('4')">4</button>
+          <button class="numpad-btn" onclick="pulsarDigito('5')">5</button>
+          <button class="numpad-btn" onclick="pulsarDigito('6')">6</button>
+          <button class="numpad-btn" onclick="pulsarDigito('7')">7</button>
+          <button class="numpad-btn" onclick="pulsarDigito('8')">8</button>
+          <button class="numpad-btn" onclick="pulsarDigito('9')">9</button>
+          <button class="numpad-btn" onclick="borrarDigito()">⌫</button>
+          <button class="numpad-btn col-span-2" onclick="pulsarDigito('0')">0</button>
+        </div>
+
+        <button onclick="confirmarId()" id="btnConfirmar"
+          class="btn-brand shadow-brand w-full text-white font-bold py-4 rounded-2xl text-base sm:text-lg"
+          disabled>
+          Iniciar valoración →
+        </button>
+      </div>
+
+      <!-- ── PANTALLA 2: PACIENTE ── -->
+      <div id="patient-screen" class="hidden p-4 sm:p-7">
+
+        <div class="relative text-center mb-3 sm:mb-5">
+          <button onclick="volverAlId()"
+            class="absolute left-0 top-0 text-xs text-slate-300 hover:text-slate-500 transition-colors py-1 px-2 rounded-lg">
+            ← Cambiar ID
+          </button>
           <div class="flex justify-center mb-2 sm:mb-4">
             <img
               src="https://www.clinicauniversitarialasalle.es/wp-content/uploads/2024/08/la-salle.png"
@@ -173,36 +249,17 @@
           <p class="text-slate-400 text-xs sm:text-base mt-0.5">Escala Global de Cambio (GROC)</p>
         </div>
 
-        <!-- Inputs -->
-        <div class="grid grid-cols-2 gap-3 mb-3 sm:mb-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Fecha de alta</label>
-            <input type="date" id="fechaFin"
-              class="w-full p-3 bg-slate-50 border-2 border-slate-100 rounded-2xl border-brand focus:bg-white outline-none transition-all text-slate-700 text-sm sm:text-base">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">ID Proceso</label>
-            <input type="text" id="idProceso"
-              placeholder="Ej: A000001"
-              maxlength="50"
-              pattern="[\w\s\-]+"
-              class="w-full p-3 bg-slate-50 border-2 border-slate-100 rounded-2xl border-brand focus:bg-white outline-none transition-all text-slate-700 text-sm sm:text-base">
-          </div>
-        </div>
-
         <!-- Escala GROC -->
         <div class="bg-slate-50 rounded-2xl p-3 sm:p-5 mb-3 sm:mb-4">
           <p class="text-center text-xs sm:text-base font-medium text-slate-600 mb-2 sm:mb-5 leading-snug">
             Comparado con el <strong>inicio del tratamiento</strong>,<br>¿cómo se encuentra hoy?
           </p>
 
-          <!-- Valor actual -->
           <div id="labelDisplay"
             class="text-center text-base sm:text-2xl font-bold text-brand mb-2 sm:mb-5 min-h-6">
             Sin cambios (0)
           </div>
 
-          <!-- Aviso si el slider no se ha movido -->
           <div id="aviso-slider"
             class="oculto text-center text-xs font-semibold text-amber-500 mb-2 flex items-center justify-center gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -212,19 +269,15 @@
             Mueve el slider para confirmar que el valor es correcto
           </div>
 
-          <!-- Slider -->
           <input type="range" id="valorGroc" min="-7" max="7" value="0" step="1"
             oninput="updateLabel(this.value)" class="mb-2 cursor-pointer neutro">
 
-          <!-- Extremos — línea central posicionada al 50% exacto -->
           <div style="position:relative; display:flex; justify-content:space-between; font-size:0.75rem; font-weight:700; padding: 0 0.25rem;">
             <span style="color:#f87171;">😞 Mucho peor</span>
             <span style="color:#22c55e;">Mucho mejor 😊</span>
-            <!-- Línea vertical anclada al 50% del contenedor, alineada con el thumb en 0 -->
             <span style="position:absolute; left:50%; transform:translateX(-50%); color:#cbd5e1; font-weight:400; pointer-events:none;">|</span>
           </div>
 
-          <!-- Escala numérica — 15 columnas iguales, una por cada stop del slider -->
           <div style="display:grid;grid-template-columns:repeat(15,1fr);font-size:0.7rem;color:#CBD5E1;margin-top:0.25rem;text-align:center;">
             <span>-7</span>
             <span></span><span></span><span></span>
@@ -238,7 +291,6 @@
           </div>
         </div>
 
-        <!-- Indicador de estado del envío -->
         <div id="status-bar" class="hidden mb-3 text-center text-xs font-medium text-slate-400 flex items-center justify-center gap-2">
           <svg class="animate-spin h-4 w-4 text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -247,19 +299,17 @@
           <span id="status-msg">Guardando…</span>
         </div>
 
-        <!-- Botón Enviar -->
         <button onclick="enviarDatos()" id="btnEnviar"
           class="btn-brand shadow-brand w-full text-white font-bold py-4 sm:py-5 rounded-2xl text-base sm:text-lg">
           GUARDAR VALORACIÓN
         </button>
 
-        <!-- Aviso privacidad -->
         <p class="text-center text-xs text-slate-300 mt-2 sm:mt-4">
           Los datos se registran de forma anónima con fines clínicos.
         </p>
       </div>
 
-      <!-- PANTALLA ÉXITO -->
+      <!-- ── PANTALLA ÉXITO ── -->
       <div id="success-content" class="hidden p-6 sm:p-10 text-center">
         <div class="animate__animated animate__zoomIn">
           <div class="bg-green-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -305,24 +355,61 @@
       "-7": "Muchísimo peor (-7)"
     };
 
-    // ── Estado del slider ───────────────────────────────────────
-    let sliderMovido = false;
-    let timeoutEnvio = null;
+    // ── Estado ─────────────────────────────────────────────────
+    let sliderMovido  = false;
+    let timeoutEnvio  = null;
+    let digitosId     = [];
+
+    // ── Numpad ─────────────────────────────────────────────────
+    function pulsarDigito(d) {
+      if (digitosId.length >= 6) return;
+      digitosId.push(d);
+      actualizarDisplayId();
+    }
+
+    function borrarDigito() {
+      if (digitosId.length === 0) return;
+      digitosId.pop();
+      actualizarDisplayId();
+    }
+
+    function actualizarDisplayId() {
+      for (let i = 0; i < 6; i++) {
+        const slot = document.getElementById('slot-' + i);
+        if (i < digitosId.length) {
+          slot.innerText = digitosId[i];
+          slot.classList.remove('activo');
+          slot.classList.add('lleno');
+        } else {
+          slot.innerText = '';
+          slot.classList.remove('lleno');
+          slot.classList.toggle('activo', i === digitosId.length);
+        }
+      }
+      document.getElementById('btnConfirmar').disabled = digitosId.length !== 6;
+    }
+
+    function confirmarId() {
+      if (digitosId.length !== 6) return;
+      document.getElementById('fisio-screen').classList.add('hidden');
+      document.getElementById('patient-screen').classList.remove('hidden');
+    }
+
+    function volverAlId() {
+      document.getElementById('patient-screen').classList.add('hidden');
+      document.getElementById('fisio-screen').classList.remove('hidden');
+    }
 
     // ── updateLabel ─────────────────────────────────────────────
     function updateLabel(val) {
       val = parseInt(val, 10);
       sliderMovido = true;
-
-      // Oculta el aviso si lo había
       document.getElementById('aviso-slider').classList.add('oculto');
 
       const display = document.getElementById('labelDisplay');
       display.innerText = etiquetas[String(val)];
 
       const slider = document.getElementById('valorGroc');
-
-      // Porcentaje para el track coloreado
       const pct = ((val + 7) / 14 * 100).toFixed(1) + '%';
       slider.style.setProperty('--pct', pct);
 
@@ -340,35 +427,24 @@
 
     // ── enviarDatos ─────────────────────────────────────────────
     function enviarDatos() {
-      const idProceso = document.getElementById('idProceso').value.trim();
-      const fechaFin  = document.getElementById('fechaFin').value;
-
-      // Validaciones en cliente
-      if (!idProceso || !fechaFin) {
-        mostrarModal('Por favor, rellene el ID del proceso y la fecha de alta.', 'error');
-        return;
-      }
-
-      if (!/^[\w\s\-]{2,50}$/i.test(idProceso)) {
-        mostrarModal('El ID de proceso solo puede contener letras, números, espacios y guiones (2-50 caracteres).', 'error');
-        return;
-      }
-
-      // Aviso si el slider no se ha movido (valor 0 sin interacción)
       if (!sliderMovido) {
         document.getElementById('aviso-slider').classList.remove('oculto');
-        // Permite continuar tras confirmación: mostramos modal
         mostrarModal(
           'El slider está en 0 (Sin cambios). ¿Es correcto? Si es así, pulsa "Aceptar" y luego "Guardar" de nuevo.',
           'aviso'
         );
-        sliderMovido = true; // la segunda vez ya no avisa
+        sliderMovido = true;
         return;
       }
 
+      const idProceso = 'A' + digitosId.join('');
+      const hoy = new Date();
+      const fechaFin = hoy.getFullYear() + '-' +
+        String(hoy.getMonth() + 1).padStart(2, '0') + '-' +
+        String(hoy.getDate()).padStart(2, '0');
+
       bloquearUI(true);
 
-      // ── Timeout de seguridad: 15 s ──────────────────────────
       timeoutEnvio = setTimeout(() => {
         mostrarModal('La conexión está tardando demasiado. Comprueba la red e inténtalo de nuevo.', 'error');
         bloquearUI(false);
@@ -389,18 +465,13 @@
           mostrarModal('Error de comunicación: ' + err.message, 'error');
           bloquearUI(false);
         })
-        .guardarRespuesta({
-          fechaFin,
-          idProceso,
-          valorGroc: document.getElementById('valorGroc').value
-        });
+        .guardarRespuesta({ fechaFin, idProceso, valorGroc: document.getElementById('valorGroc').value });
     }
 
     // ── bloquearUI ──────────────────────────────────────────────
     function bloquearUI(bloqueado) {
       const btn       = document.getElementById('btnEnviar');
       const statusBar = document.getElementById('status-bar');
-
       if (bloqueado) {
         btn.disabled = true;
         btn.innerText = 'GUARDANDO…';
@@ -419,7 +490,7 @@
 
     // ── mostrarExito ────────────────────────────────────────────
     function mostrarExito() {
-      document.getElementById('form-content').classList.add('hidden');
+      document.getElementById('patient-screen').classList.add('hidden');
       document.getElementById('success-content').classList.remove('hidden');
 
       let segundos = 5;
@@ -433,49 +504,42 @@
         if (segundos <= 0) clearInterval(intervalo);
       }, 1000);
 
-      setTimeout(() => {
-        resetFormulario();
-      }, 5000);
+      setTimeout(() => resetFormulario(), 5000);
     }
 
     // ── resetFormulario ─────────────────────────────────────────
     function resetFormulario() {
-      document.getElementById('form-content').classList.remove('hidden');
       document.getElementById('success-content').classList.add('hidden');
+      document.getElementById('patient-screen').classList.add('hidden');
+      document.getElementById('fisio-screen').classList.remove('hidden');
 
-      document.getElementById('idProceso').value = '';
-      document.getElementById('fechaFin').valueAsDate = new Date();
+      digitosId = [];
+      actualizarDisplayId();
+
       document.getElementById('valorGroc').value = 0;
-      sliderMovido = false;
-
       document.getElementById('aviso-slider').classList.add('oculto');
       document.getElementById('status-bar').classList.add('hidden');
       document.getElementById('status-bar').classList.remove('flex');
       updateLabel(0);
+      sliderMovido = false;
       bloquearUI(false);
     }
 
-    // ── Modal (tipo: 'error' | 'aviso') ─────────────────────────
+    // ── Modal ───────────────────────────────────────────────────
     function mostrarModal(msg, tipo = 'error') {
       document.getElementById('modal-msg').innerText = msg;
-
       const wrap = document.getElementById('modal-icon-wrap');
       if (tipo === 'aviso') {
         wrap.className = 'bg-amber-100 w-14 h-14 rounded-full flex items-center justify-center';
-        wrap.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-              d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-          </svg>`;
+        wrap.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+            d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>`;
       } else {
         wrap.className = 'bg-red-100 w-14 h-14 rounded-full flex items-center justify-center';
-        wrap.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-              d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-          </svg>`;
+        wrap.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+            d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>`;
       }
-
       document.getElementById('custom-modal').classList.add('visible');
     }
 
@@ -485,9 +549,9 @@
 
     // ── Inicio ──────────────────────────────────────────────────
     window.onload = () => {
-      document.getElementById('fechaFin').valueAsDate = new Date();
+      actualizarDisplayId();
       updateLabel(0);
-      sliderMovido = false; // garantiza el estado inicial aunque updateLabel lo ponga a true
+      sliderMovido = false;
     };
   </script>
 </body>
