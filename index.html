@@ -372,7 +372,7 @@
           </p>
           <div class="mt-6 bg-slate-100 rounded-full h-2 overflow-hidden">
             <div id="progressBar"
-              class="h-2 bg-brand-light rounded-full transition-all duration-1000"
+              class="h-2 bg-brand-light rounded-full"
               style="width:100%">
             </div>
           </div>
@@ -564,14 +564,19 @@
 
       let segundos = 5;
       const countdownEl = document.getElementById('countdown');
-      const progressBar = document.getElementById('progressBar');
-
       const intervalo = setInterval(() => {
         segundos--;
         countdownEl.innerText = segundos;
-        progressBar.style.width = (segundos / 5 * 100) + '%';
         if (segundos <= 0) clearInterval(intervalo);
       }, 1000);
+
+      const progressBar = document.getElementById('progressBar');
+      progressBar.style.transition = 'none';
+      progressBar.style.width = '100%';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        progressBar.style.transition = 'width 5s linear';
+        progressBar.style.width = '0%';
+      }));
 
       setTimeout(() => resetFormulario(), 5000);
     }
@@ -584,6 +589,11 @@
 
       digitosId = [];
       actualizarDisplayId();
+
+      const pb = document.getElementById('progressBar');
+      pb.style.transition = 'none';
+      pb.style.width = '100%';
+      document.getElementById('countdown').innerText = '5';
 
       document.getElementById('valorGroc').value = 0;
       document.getElementById('aviso-slider').classList.add('oculto');
