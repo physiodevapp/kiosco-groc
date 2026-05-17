@@ -32,10 +32,23 @@ Para que los cambios sean visibles en producción puede ser necesario crear una 
 
 ## Validaciones
 
-- `fechaFin`: string `YYYY-MM-DD`, se valida como fecha real
-- `idProceso`: regex `[\w\s\-]{2,50}` (letras, números, guion, espacio)
+- `fechaFin`: string `YYYY-MM-DD`, generada automáticamente en el cliente como fecha local de hoy
+- `idProceso`: regex `A\d{6}` — siempre "A" + 6 dígitos (ej. A000001), construido por el numpad
 - `valorGroc`: entero entre -7 y 7
-- Validación duplicada en cliente (`index.html`) y servidor (`Código.js`)
+- Validación en cliente (`index.html`) y servidor (`Código.js`)
+
+## Formato de commits
+
+Cuando se pida hacer un commit, usar siempre este formato:
+
+```bash
+git commit -m "título corto en imperativo" -m "descripción cuando sea necesario"
+```
+
+- El primer `-m` es el título (máx ~72 caracteres)
+- El segundo `-m` solo se incluye cuando hay contexto relevante que añadir
+- Nunca usar `git commit` sin flags ni editores interactivos
+- **No añadir co-autoría** (`Co-authored-by`) en ningún caso
 
 ## Seguridad
 
