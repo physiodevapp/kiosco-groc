@@ -1,13 +1,13 @@
-# Kiosco GROC — Control de versiones con Clasp + Git + GitHub
+# Kiosco GROC — Version control with Clasp + Git + GitHub
 
-Guía para conectar un proyecto existente de Google Apps Script con VS Code y GitHub.
+Guide for connecting an existing Google Apps Script project with VS Code and GitHub.
 
 ---
 
-## Requisitos previos
+## Prerequisites
 
-- WSL activo en VS Code
-- Node.js y npm instalados en WSL
+- WSL active in VS Code
+- Node.js and npm installed in WSL
 
 ```bash
 node -v   # v24+
@@ -16,70 +16,69 @@ npm -v    # v11+
 
 ---
 
-## 1. Instalar Clasp
+## 1. Install Clasp
 
 ```bash
 npm install -g @google/clasp
-clasp --version   # verifica que instaló correctamente
+clasp --version   # verify installation
 ```
 
-Activa la API de Apps Script en tu cuenta Google (solo una vez):
-👉 https://script.google.com/home/usersettings → **"Google Apps Script API"** → Activar
+Enable the Apps Script API on your Google account (once only):
+👉 https://script.google.com/home/usersettings → **"Google Apps Script API"** → Enable
 
 ---
 
-## 2. Iniciar sesión en Clasp
+## 2. Log in to Clasp
 
 ```bash
 clasp login
 ```
 
-Copia el enlace que aparece en la terminal, pégalo en tu navegador de Windows y autoriza con tu cuenta Google.
-Acepta **todos** los permisos que solicita.
+Copy the link shown in the terminal, paste it in your Windows browser, and authorize with your Google account. Accept **all** requested permissions.
 
 ---
 
-## 3. Obtener el Script ID
+## 3. Get the Script ID
 
-En el editor web de GAS:
-**⚙️ Configuración del proyecto → ID de secuencia de comandos**
+In the GAS web editor:
+**⚙️ Project settings → Script ID**
 
-Es una cadena larga tipo:
+It's a long string like:
 ```
 1BxYz_abcDEF1234567890abcdefGHIJKLMNOP
 ```
 
 ---
 
-## 4. Clonar el proyecto existente
+## 4. Clone the existing project
 
 ```bash
 mkdir ~/kiosco-groc
 cd ~/kiosco-groc
-clasp clone <TU_SCRIPT_ID>
+clasp clone <YOUR_SCRIPT_ID>
 ```
 
-Esto descarga los archivos actuales del proyecto:
-- `codigo.gs`
+This downloads the current project files:
+- `Código.js`
 - `index.html`
 - `appsscript.json`
-- `.clasp.json` (contiene el Script ID, no es sensible)
+- `.clasp.json` (contains the Script ID — not sensitive)
 
 ---
 
-## 5. Abrir en VS Code
+## 5. Open in VS Code
 
 ```bash
 code .
 ```
 
-A partir de aquí **edita siempre desde VS Code**, no desde el editor web de GAS.
+From here, **always edit from VS Code**, not from the GAS web editor.
 
 ---
 
-## 6. Crear el .gitignore
+## 6. Create .gitignore
 
-Antes del primer commit, crea el `.gitignore`:
+Before the first commit, create `.gitignore`:
 
 ```bash
 cat > .gitignore << 'EOF'
@@ -88,87 +87,100 @@ node_modules/
 EOF
 ```
 
-> ⚠️ `.clasprc.json` contiene tu token personal de sesión — **nunca debe subirse a GitHub**.
-> `.clasp.json` sí debe incluirse en Git (solo tiene el Script ID, no credenciales).
+> ⚠️ `.clasprc.json` contains your personal session token — **never push it to GitHub**.
+> `.clasp.json` should be included in Git (it only contains the Script ID, no credentials).
 
 ---
 
-## 7. Inicializar Git y primer commit
+## 7. Initialize Git and first commit
 
 ```bash
 git init
 git add .
-git commit -m "feat: commit inicial — kiosco GROC"
+git commit -m "feat: initial commit — kiosco GROC"
 ```
 
 ---
 
-## 8. Crear repositorio en GitHub y conectarlo
+## 8. Create a GitHub repository and connect it
 
-1. Ve a [github.com](https://github.com) y crea un repositorio nuevo (ej. `kiosco-groc`)
-2. **Sin** inicializar con README ni .gitignore
-3. Conecta el remoto desde WSL:
+1. Go to [github.com](https://github.com) and create a new repository (e.g. `kiosco-groc`)
+2. **Without** initializing with README or .gitignore
+3. Connect the remote from WSL:
 
 ```bash
-git remote add origin https://github.com/TU_USUARIO/kiosco-groc.git
+git remote add origin https://github.com/YOUR_USERNAME/kiosco-groc.git
 git branch -M main
 git push -u origin main
 ```
 
 ---
 
-## Flujo de trabajo diario
+## Clasp reference commands
+
+| Command | Action |
+|---|---|
+| `clasp push` | Upload changes local → GAS |
+| `clasp pull` | Download changes GAS → local |
+| `clasp open` | Open the GAS web editor |
+| `clasp deployments` | List deployments and their IDs |
+| `clasp deploy --deploymentId <id> --description "v1.x"` | Update an existing deployment to the latest pushed code |
+| `clasp logs` | View execution logs |
+| `clasp --version` | Installed version |
+
+---
+
+## From VS Code to production
+
+### What each action does
+
+| Action | Result | Visible to |
+|---|---|---|
+| Live Server | Local preview (no `google.script.run`) | You only |
+| `clasp push` | Code updated in GAS editor | No one in production |
+| `clasp push` + `/dev` URL | Full flow test with Sheets | Project editors only |
+| `clasp deploy --deploymentId <id>` | Public `/exec` URL updated | Everyone (patients) |
+
+### GAS URLs
+
+- **`/dev`** — always runs the latest `clasp push`. Requires being logged in as editor. Use for testing.
+- **`/exec`** — production URL. Only changes when a new deployment version is created.
+
+### Typical workflow
 
 ```bash
-# 1. Editas los archivos en VS Code
+# 1. Iterate UI (styles, layout) → Live Server in VS Code
 
-# 2. Subes cambios a GitHub
+# 2. Test the full flow (real submission to Sheets)
+clasp push
+# Open /dev URL in the browser
+
+# 3. Save to Git
 git add .
-git commit -m "fix: descripción del cambio"
+git commit -m "type: change description"
 git push
 
-# 3. Subes cambios a Google Apps Script
-clasp push
+# 4. Publish to production
+clasp push                                              # if not done in step 2
+clasp deployments                                       # copy the deploymentId
+clasp deploy --deploymentId <id> --description "v1.x"
 ```
 
-Si alguien editó directamente en el editor web de GAS (evitar en lo posible):
+Steps 3 and 4 are independent of each other.
+
+If someone edited directly in the GAS web editor (avoid when possible):
 ```bash
 clasp pull
 git add .
-git commit -m "sync: cambios desde editor web"
+git commit -m "sync: changes from web editor"
 git push
 ```
 
 ---
 
-## Comandos Clasp de referencia
+## Project notes
 
-| Comando | Acción |
-|---|---|
-| `clasp push` | Sube cambios local → GAS |
-| `clasp pull` | Descarga cambios GAS → local |
-| `clasp open` | Abre el editor web de GAS |
-| `clasp deploy` | Crea una nueva implementación |
-| `clasp logs` | Ver logs de ejecución |
-| `clasp --version` | Versión instalada |
-
----
-
-## Arquitectura del flujo completo
-
-```
-VS Code (WSL)
-      │
-      ├── git push ──→ GitHub (historial de versiones)
-      │
-      └── clasp push ──→ Google Apps Script ──→ Google Sheets
-```
-
----
-
-## Notas del proyecto
-
-- **SHEET_ID** almacenado en *Propiedades del script* (nunca en el código)
-- Tailwind CSS v2 via jsDelivr (sin warning de producción)
-- Reset automático del kiosco tras envío exitoso (5 s)
-- Timeout de red de 15 s en el frontend
+- **SHEET_ID** stored in *Script Properties* (never in source code)
+- Tailwind CSS v2 via jsDelivr CDN (no production warning)
+- Automatic kiosk reset after successful submission (5 s)
+- Network timeout of 15 s in the frontend
