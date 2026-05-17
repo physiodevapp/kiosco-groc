@@ -9,7 +9,7 @@ const SHEET_NAME = 'Respuestas';
 function doGet() {
   return HtmlService.createTemplateFromFile('index')
       .evaluate()
-      .setTitle('Valoración GROC - Clínica')
+      .setTitle('Valoración GROC - Clínica Universitaria La Salle')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setFaviconUrl("https://www.clinicauniversitarialasalle.es/wp-content/uploads/2024/10/cropped-estrella-1-32x32.png")
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
