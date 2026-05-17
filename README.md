@@ -1,40 +1,41 @@
-# Kiosco GROC — Valoración de Mejora Clínica
+# Kiosco GROC — Clinical Improvement Assessment
 
-Kiosco táctil para registrar la Escala Global de Cambio (GROC) al alta de pacientes de rehabilitación. Los datos se guardan directamente en Google Sheets.
+Touch kiosk for recording the Global Rating of Change (GROC) scale at patient discharge from rehabilitation. Data is saved directly to Google Sheets.
 
-## Tecnología
+## Tech stack
 
-- **Google Apps Script** — backend y hosting de la webapp
-- **HTML + Tailwind CSS v2** — interfaz táctil responsive
-- **Clasp** — sincronización local ↔ GAS via CLI
-- **Git + GitHub** — control de versiones
+- **Google Apps Script** — backend and webapp hosting
+- **HTML + Tailwind CSS v2** — responsive touch interface
+- **Clasp** — local ↔ GAS sync via CLI
+- **Git + GitHub** — version control
 
-## Arquitectura
+## Architecture
 
 ```
 VS Code (WSL)
       │
-      ├── git push ──→ GitHub (historial)
+      ├── git push ──→ GitHub (history)
       │
       └── clasp push ──→ Google Apps Script ──→ Google Sheets
 ```
 
-## Configuración inicial
+## Setup
 
-Ver [CONTRIBUTING.md](CONTRIBUTING.md) para la guía completa de instalación y flujo de trabajo diario.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full installation guide and development workflow.
 
-El `SHEET_ID` de Google Sheets se guarda en **Propiedades del script** (nunca en el código fuente).
+The Google Sheets `SHEET_ID` is stored in **Script Properties** (never in source code).
 
-## Flujo de trabajo
+## Workflow
 
 ```bash
-# Editar en VS Code, luego:
+# Edit in VS Code, then:
 git add . && git commit -m "..." && git push   # → GitHub
 clasp push                                      # → Google Apps Script
+clasp deploy --deploymentId <id>               # → production URL
 ```
 
-## Notas
+## Notes
 
-- La webapp es de acceso anónimo (`ANYONE_ANONYMOUS`) — diseñada para uso en kiosco interno
-- Reset automático del formulario tras envío exitoso (5 s)
-- Timeout de red de 15 s en el frontend
+- Webapp is anonymously accessible (`ANYONE_ANONYMOUS`) — designed for internal kiosk use
+- Automatic form reset after successful submission (5 s)
+- Network timeout of 15 s in the frontend
