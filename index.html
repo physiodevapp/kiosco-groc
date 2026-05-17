@@ -127,10 +127,10 @@
     }
     /* Estado neutro (0) */
     #valorGroc.neutro::-webkit-slider-runnable-track  { background: linear-gradient(to right, #E5E7EB var(--pct), #E5E7EB var(--pct)); }
-    /* Estado positivo */
-    #valorGroc.positivo::-webkit-slider-runnable-track { background: linear-gradient(to right, #16a34a var(--pct), #E5E7EB var(--pct)); }
-    /* Estado negativo — llenamos desde la derecha */
-    #valorGroc.negativo::-webkit-slider-runnable-track { background: linear-gradient(to right, #E5E7EB var(--pct), #dc2626 var(--pct)); }
+    /* Estado positivo — verde desde el centro (50%) hasta el thumb */
+    #valorGroc.positivo::-webkit-slider-runnable-track { background: linear-gradient(to right, #E5E7EB 50%, #16a34a 50%, #16a34a var(--pct), #E5E7EB var(--pct)); }
+    /* Estado negativo — rojo desde el thumb hasta el centro (50%) */
+    #valorGroc.negativo::-webkit-slider-runnable-track { background: linear-gradient(to right, #E5E7EB var(--pct), #dc2626 var(--pct), #dc2626 50%, #E5E7EB 50%); }
   </style>
 </head>
 
