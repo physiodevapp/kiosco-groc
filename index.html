@@ -156,6 +156,23 @@
     }
     .id-slot.activo { border-color: var(--brand-600); }
     .id-slot.lleno  { border-color: var(--brand-500); color: var(--brand-600); }
+
+    /* ── Botones de unidad ── */
+    .unit-btn {
+      background: white;
+      border: 2px solid #E2E8F0;
+      border-radius: 1rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--brand-600);
+      padding: 1.25rem 1.5rem;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+    }
+    .unit-btn:hover  { border-color: var(--brand-500); background: var(--brand-50); }
+    .unit-btn:active { background: var(--brand-100); transform: scale(0.97); border-color: var(--brand-500); }
   </style>
 </head>
 
@@ -178,10 +195,10 @@
   <div class="card-wrapper">
     <div class="bg-white shadow-2xl rounded-3xl w-full max-w-xl animate__animated animate__fadeIn">
 
-      <!-- ── PANTALLA 1: FISIO ── -->
-      <div id="fisio-screen" class="p-4 sm:p-7">
+      <!-- ── PANTALLA 0: UNIDAD ── -->
+      <div id="unit-screen" class="p-4 sm:p-7">
 
-        <div class="text-center mb-4 sm:mb-6">
+        <div class="text-center mb-6 sm:mb-8">
           <div class="flex justify-center mb-2 sm:mb-3">
             <img
               src="https://www.clinicauniversitarialasalle.es/wp-content/uploads/2024/08/la-salle.png"
@@ -190,7 +207,37 @@
               loading="eager"
             >
           </div>
-          <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">Terapeuta</p>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">Inicio</p>
+          <h1 class="text-lg sm:text-2xl font-bold text-slate-800">Selecciona la unidad de rehabilitación</h1>
+        </div>
+
+        <div class="flex flex-col gap-3 sm:gap-4">
+          <button class="unit-btn" onclick="seleccionarUnidad('Infantil')">Infantil</button>
+          <button class="unit-btn" onclick="seleccionarUnidad('Trauma')">Trauma</button>
+          <button class="unit-btn" onclick="seleccionarUnidad('Neuro')">Neuro</button>
+        </div>
+
+      </div>
+
+      <!-- ── PANTALLA 1: FISIO ── -->
+      <div id="fisio-screen" class="hidden p-4 sm:p-7">
+
+        <div class="relative text-center mb-4 sm:mb-6">
+          <button onclick="volverAUnidad()"
+            class="absolute left-0 top-0 text-xs text-slate-300 hover:text-slate-500 transition-colors py-1 px-2 rounded-lg">
+            ← Cambiar unidad
+          </button>
+          <div class="flex justify-center mb-2 sm:mb-3">
+            <img
+              src="https://www.clinicauniversitarialasalle.es/wp-content/uploads/2024/08/la-salle.png"
+              alt="Clínica Universitaria La Salle"
+              class="h-10 sm:h-14 w-auto object-contain"
+              loading="eager"
+            >
+          </div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">
+            Terapeuta · <span id="unidad-badge" class="text-brand"></span>
+          </p>
           <h1 class="text-lg sm:text-2xl font-bold text-slate-800">Introduce el ID del proceso</h1>
         </div>
 
@@ -356,9 +403,27 @@
     };
 
     // ── Estado ─────────────────────────────────────────────────
-    let sliderMovido  = false;
-    let timeoutEnvio  = null;
-    let digitosId     = [];
+    let sliderMovido       = false;
+    let timeoutEnvio       = null;
+    let digitosId          = [];
+    let unidadSeleccionada = null;
+
+    // ── Selección de unidad ─────────────────────────────────────
+    function seleccionarUnidad(unidad) {
+      unidadSeleccionada = unidad;
+      document.getElementById('unidad-badge').innerText = unidad;
+      document.getElementById('unit-screen').classList.add('hidden');
+      document.getElementById('fisio-screen').classList.remove('hidden');
+    }
+
+    function volverAUnidad() {
+      unidadSeleccionada = null;
+      document.getElementById('unidad-badge').innerText = '';
+      digitosId = [];
+      actualizarDisplayId();
+      document.getElementById('fisio-screen').classList.add('hidden');
+      document.getElementById('unit-screen').classList.remove('hidden');
+    }
 
     // ── Numpad ─────────────────────────────────────────────────
     function pulsarDigito(d) {
@@ -391,6 +456,10 @@
 
     function confirmarId() {
       if (digitosId.length !== 6) return;
+      document.getElementById('valorGroc').value = 0;
+      document.getElementById('aviso-slider').classList.add('oculto');
+      updateLabel(0);
+      sliderMovido = false;
       document.getElementById('fisio-screen').classList.add('hidden');
       document.getElementById('patient-screen').classList.remove('hidden');
     }
@@ -465,7 +534,7 @@
           mostrarModal('Error de comunicación: ' + err.message, 'error');
           bloquearUI(false);
         })
-        .guardarRespuesta({ fechaFin, idProceso, valorGroc: document.getElementById('valorGroc').value });
+        .guardarRespuesta({ fechaFin, idProceso, valorGroc: document.getElementById('valorGroc').value, unidad: unidadSeleccionada });
     }
 
     // ── bloquearUI ──────────────────────────────────────────────

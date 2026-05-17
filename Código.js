@@ -22,9 +22,9 @@ function guardarRespuesta(datos) {
       throw new Error('No se recibieron datos.');
     }
 
-    const { fechaFin, idProceso, valorGroc } = datos;
+    const { fechaFin, idProceso, valorGroc, unidad } = datos;
 
-    if (!fechaFin || !idProceso || valorGroc === undefined || valorGroc === null) {
+    if (!fechaFin || !idProceso || valorGroc === undefined || valorGroc === null || !unidad) {
       throw new Error('Faltan campos obligatorios.');
     }
 
@@ -48,7 +48,13 @@ function guardarRespuesta(datos) {
       throw new Error('El ID de proceso debe tener el formato A seguido de 6 dígitos (ej. A000001).');
     }
 
-    // ── 5. Etiquetas (claves como strings para evitar ambigüedad) ──
+    // ── 5. Validación de la unidad ───────────────────────────
+    const UNIDADES_VALIDAS = ['Infantil', 'Trauma', 'Neuro'];
+    if (!UNIDADES_VALIDAS.includes(unidad)) {
+      throw new Error('La unidad de rehabilitación no es válida.');
+    }
+
+    // ── 6. Etiquetas (claves como strings para evitar ambigüedad) ──
     const etiquetas = {
       "7":  "Muchísimo mejor",
       "6":  "Mucho mejor",
@@ -67,7 +73,7 @@ function guardarRespuesta(datos) {
       "-7": "Muchísimo peor"
     };
 
-    // ── 6. Apertura de la hoja ───────────────────────────────
+    // ── 7. Apertura de la hoja ───────────────────────────────
     const sheetId = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
     if (!sheetId) {
       throw new Error('SHEET_ID no configurado en las propiedades del script.');
@@ -86,19 +92,20 @@ function guardarRespuesta(datos) {
         'Timestamp',
         'Fecha Fin Tratamiento',
         'ID Proceso Rehabilitación',
+        'Unidad de Rehabilitación',
         'Valor GROC',
         'Etiqueta GROC'
       ]);
 
       // Formato de cabecera: negrita + fondo azul marca
-      const headerRange = sheet.getRange(1, 1, 1, 5);
+      const headerRange = sheet.getRange(1, 1, 1, 6);
       headerRange.setFontWeight('bold');
       headerRange.setBackground('#202A60');
       headerRange.setFontColor('#FFFFFF');
       sheet.setFrozenRows(1);
     }
 
-    // ── 7. Escritura con bloqueo de concurrencia ─────────────
+    // ── 8. Escritura con bloqueo de concurrencia ─────────────
     const lock = LockService.getScriptLock();
     lock.waitLock(10000); // espera hasta 10 s antes de fallar
 
@@ -107,6 +114,7 @@ function guardarRespuesta(datos) {
         new Date(),           // Timestamp exacto del servidor
         fechaParsed,          // Objeto Date (Google lo formatea automáticamente)
         idProceso.trim(),     // Sin espacios sobrantes
+        unidad,
         valor,
         etiquetas[String(valor)] || ''
       ]);
