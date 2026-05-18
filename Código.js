@@ -38,8 +38,8 @@ function guardarRespuesta(datos) {
 
     // ── 3. Validación del valor GROC ─────────────────────────
     const valor = Number(valorGroc);
-    if (isNaN(valor) || valor < -7 || valor > 7 || !Number.isInteger(valor)) {
-      throw new Error('El valor GROC debe ser un entero entre -7 y 7.');
+    if (isNaN(valor) || valor < -3 || valor > 3 || !Number.isInteger(valor)) {
+      throw new Error('El valor GROC debe ser un entero entre -3 y 3.');
     }
 
     // ── 4. Validación de la unidad ───────────────────────────
@@ -50,21 +50,13 @@ function guardarRespuesta(datos) {
 
     // ── 6. Etiquetas (claves como strings para evitar ambigüedad) ──
     const etiquetas = {
-      "7":  "Muchísimo mejor",
-      "6":  "Mucho mejor",
-      "5":  "Moderadamente mejor",
-      "4":  "Algo mejor",
-      "3":  "Un poco mejor",
-      "2":  "Casi igual (un poco mejor)",
-      "1":  "Casi igual (mínimamente mejor)",
+      "3":  "Mucho mejor",
+      "2":  "Moderadamente mejor",
+      "1":  "Un poco mejor",
       "0":  "Sin cambios",
-      "-1": "Casi igual (mínimamente peor)",
-      "-2": "Casi igual (un poco peor)",
-      "-3": "Un poco peor",
-      "-4": "Algo peor",
-      "-5": "Moderadamente peor",
-      "-6": "Mucho peor",
-      "-7": "Muchísimo peor"
+      "-1": "Un poco peor",
+      "-2": "Moderadamente peor",
+      "-3": "Mucho peor"
     };
 
     // ── 7. Apertura de la hoja ───────────────────────────────
