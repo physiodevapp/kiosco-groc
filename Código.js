@@ -22,9 +22,9 @@ function guardarRespuesta(datos) {
       throw new Error('No se recibieron datos.');
     }
 
-    const { fechaFin, idProceso, valorGroc, unidad } = datos;
+    const { fechaFin, valorGroc, unidad } = datos;
 
-    if (!fechaFin || !idProceso || valorGroc === undefined || valorGroc === null || !unidad) {
+    if (!fechaFin || valorGroc === undefined || valorGroc === null || !unidad) {
       throw new Error('Faltan campos obligatorios.');
     }
 
@@ -42,14 +42,8 @@ function guardarRespuesta(datos) {
       throw new Error('El valor GROC debe ser un entero entre -7 y 7.');
     }
 
-    // ── 4. Validación del ID de proceso ─────────────────────
-    // Formato fijo: A seguido de exactamente 6 dígitos.
-    if (!/^A\d{6}$/.test(idProceso)) {
-      throw new Error('El ID de proceso debe tener el formato A seguido de 6 dígitos (ej. A000001).');
-    }
-
-    // ── 5. Validación de la unidad ───────────────────────────
-    const UNIDADES_VALIDAS = ['Infantil', 'Trauma', 'Neuro'];
+    // ── 4. Validación de la unidad ───────────────────────────
+    const UNIDADES_VALIDAS = ['Infantil', 'Trauma', 'Neuro', 'Salud Mental', 'Podología', 'TO'];
     if (!UNIDADES_VALIDAS.includes(unidad)) {
       throw new Error('La unidad de rehabilitación no es válida.');
     }
@@ -91,14 +85,13 @@ function guardarRespuesta(datos) {
       sheet.appendRow([
         'Timestamp',
         'Fecha Fin Tratamiento',
-        'ID Proceso Rehabilitación',
         'Unidad de Rehabilitación',
         'Valor GROC',
         'Etiqueta GROC'
       ]);
 
       // Formato de cabecera: negrita + fondo azul marca
-      const headerRange = sheet.getRange(1, 1, 1, 6);
+      const headerRange = sheet.getRange(1, 1, 1, 5);
       headerRange.setFontWeight('bold');
       headerRange.setBackground('#202A60');
       headerRange.setFontColor('#FFFFFF');
@@ -111,9 +104,8 @@ function guardarRespuesta(datos) {
 
     try {
       sheet.appendRow([
-        new Date(),           // Timestamp exacto del servidor
-        fechaParsed,          // Objeto Date (Google lo formatea automáticamente)
-        idProceso.trim(),     // Sin espacios sobrantes
+        new Date(),    // Timestamp exacto del servidor
+        fechaParsed,   // Objeto Date (Google lo formatea automáticamente)
         unidad,
         valor,
         etiquetas[String(valor)] || ''
