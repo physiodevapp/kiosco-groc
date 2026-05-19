@@ -374,11 +374,6 @@
         return;
       }
 
-      const hoy = new Date();
-      const fechaFin = hoy.getFullYear() + '-' +
-        String(hoy.getMonth() + 1).padStart(2, '0') + '-' +
-        String(hoy.getDate()).padStart(2, '0');
-
       bloquearUI(true);
 
       timeoutEnvio = setTimeout(() => {
@@ -401,7 +396,7 @@
           mostrarModal('Error de comunicación: ' + err.message, 'error');
           bloquearUI(false);
         })
-        .guardarRespuesta({ fechaFin, valorGroc: document.getElementById('valorGroc').value, unidad: unidadSeleccionada });
+        .guardarRespuesta({ valorGroc: document.getElementById('valorGroc').value, unidad: unidadSeleccionada });
     }
 
     // ── bloquearUI ──────────────────────────────────────────────

@@ -22,21 +22,13 @@ function guardarRespuesta(datos) {
       throw new Error('No se recibieron datos.');
     }
 
-    const { fechaFin, valorGroc, unidad } = datos;
+    const { valorGroc, unidad } = datos;
 
-    if (!fechaFin || valorGroc === undefined || valorGroc === null || !unidad) {
+    if (valorGroc === undefined || valorGroc === null || !unidad) {
       throw new Error('Faltan campos obligatorios.');
     }
 
-    // ── 2. Validación de fecha ───────────────────────────────
-    // fechaFin llega como string "YYYY-MM-DD"; comprobamos que
-    // sea una fecha real, no texto arbitrario.
-    const fechaParsed = new Date(fechaFin);
-    if (isNaN(fechaParsed.getTime())) {
-      throw new Error('La fecha de alta no es válida.');
-    }
-
-    // ── 3. Validación del valor GROC ─────────────────────────
+    // ── 2. Validación del valor GROC ─────────────────────────
     const valor = Number(valorGroc);
     if (isNaN(valor) || valor < -3 || valor > 3 || !Number.isInteger(valor)) {
       throw new Error('El valor GROC debe ser un entero entre -3 y 3.');
@@ -76,14 +68,13 @@ function guardarRespuesta(datos) {
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
         'Timestamp',
-        'Fecha Fin Tratamiento',
         'Unidad de Rehabilitación',
         'Valor GROC',
         'Etiqueta GROC'
       ]);
 
       // Formato de cabecera: negrita + fondo azul marca
-      const headerRange = sheet.getRange(1, 1, 1, 5);
+      const headerRange = sheet.getRange(1, 1, 1, 4);
       headerRange.setFontWeight('bold');
       headerRange.setBackground('#202A60');
       headerRange.setFontColor('#FFFFFF');
@@ -96,8 +87,7 @@ function guardarRespuesta(datos) {
 
     try {
       sheet.appendRow([
-        new Date(),    // Timestamp exacto del servidor
-        fechaParsed,   // Objeto Date (Google lo formatea automáticamente)
+        new Date(),
         unidad,
         valor,
         etiquetas[String(valor)] || ''
