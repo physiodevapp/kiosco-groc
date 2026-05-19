@@ -9,7 +9,8 @@ Kiosco táctil para registrar la Escala Global de Cambio (GROC) al alta de pacie
 - `Código.js` — Google Apps Script (backend): expone `doGet()` y `guardarRespuesta(datos)`
 - `index.html` — Frontend completo (HTML + CSS + JS inline), servido por GAS via `HtmlService`
 - `appsscript.json` — Configuración del proyecto GAS (timezone, permisos, runtime V8)
-- `.clasp.json` — Configuración de Clasp (scriptId del proyecto GAS)
+- `.clasp.personal.json` / `.clasp.prod.json` — scriptIds de cada entorno (ver Flujo de deploy)
+- `.clasp.json` — archivo activo generado por el Makefile, ignorado por git
 
 ## Arquitectura clave
 
@@ -24,11 +25,14 @@ Kiosco táctil para registrar la Escala Global de Cambio (GROC) al alta de pacie
 
 ## Flujo de deploy
 
+Hay dos entornos gestionados con `make`. El archivo `.clasp.json` es generado automáticamente y no se versiona.
+
 ```bash
-clasp push    # sube cambios a Google Apps Script
+make push-personal   # sube al proyecto GAS personal (pruebas)
+make push-prod       # sube al proyecto GAS de producción y revierte .clasp.json
 ```
 
-Para que los cambios sean visibles en producción puede ser necesario crear una nueva implementación en GAS (`clasp deploy`).
+Para que los cambios sean visibles en la URL pública puede ser necesario crear una nueva implementación en GAS (`clasp deploy`).
 
 ## Validaciones
 
@@ -53,5 +57,6 @@ git commit -m "título corto en imperativo" -m "descripción cuando sea necesari
 ## Seguridad
 
 - `.clasprc.json` (token OAuth de Google) excluido por `.gitignore` — vive en `~/.clasprc.json`
-- `.clasp.json` (solo el scriptId) sí se versiona — no contiene credenciales
+- `.clasp.json` excluido por `.gitignore` — generado por el Makefile, no contiene credenciales
+- `.clasp.personal.json` / `.clasp.prod.json` — sí se versionan, contienen solo el scriptId
 - LockService en el backend para evitar escrituras concurrentes en Sheets
