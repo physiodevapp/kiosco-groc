@@ -43,7 +43,7 @@ function guardarRespuesta(datos) {
     }
 
     // ── 4. Validación de la unidad ───────────────────────────
-    const UNIDADES_VALIDAS = ['Infantil', 'Trauma', 'Neuro', 'Salud Mental', 'Podología', 'TO'];
+    const UNIDADES_VALIDAS = ['Trauma', 'Neuro', 'Podología', 'Infantil', 'Salud Mental', 'Cardio Respi', 'Suelo Pélvico', 'ATM', 'TO'];
     if (!UNIDADES_VALIDAS.includes(unidad)) {
       throw new Error('La unidad de rehabilitación no es válida.');
     }

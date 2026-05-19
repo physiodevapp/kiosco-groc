@@ -130,14 +130,21 @@
       background: white;
       border: 2px solid #E2E8F0;
       border-radius: 1rem;
-      font-size: 1.25rem;
+      font-size: 1rem;
       font-weight: 700;
       color: var(--brand-600);
-      padding: 1.25rem 1.5rem;
+      padding: 0 1rem;
+      height: 4.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: all 0.15s ease;
       cursor: pointer;
       width: 100%;
       text-align: center;
+    }
+    @media (min-width: 768px) {
+      .unit-btn { font-size: 1.15rem; height: 5rem; padding: 0 1.25rem; }
     }
     .unit-btn:hover  { border-color: var(--brand-500); background: var(--brand-50); }
     .unit-btn:active { background: var(--brand-100); transform: scale(0.97); border-color: var(--brand-500); }
@@ -178,13 +185,16 @@
           <h1 class="text-lg sm:text-2xl font-bold text-slate-800">Selecciona la unidad de rehabilitación</h1>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <button class="unit-btn" onclick="seleccionarUnidad('Infantil')">Infantil</button>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           <button class="unit-btn" onclick="seleccionarUnidad('Trauma')">Trauma</button>
           <button class="unit-btn" onclick="seleccionarUnidad('Neuro')">Neuro</button>
-          <button class="unit-btn" onclick="seleccionarUnidad('Salud Mental')">Salud Mental</button>
           <button class="unit-btn" onclick="seleccionarUnidad('Podología')">Podología</button>
-          <button class="unit-btn" onclick="seleccionarUnidad('TO')">TO</button>
+          <button class="unit-btn" onclick="seleccionarUnidad('Infantil')">Infantil</button>
+          <button class="unit-btn" onclick="seleccionarUnidad('Salud Mental')">Salud Mental</button>
+          <button class="unit-btn" onclick="seleccionarUnidad('Cardio Respi')">Cardio Respi</button>
+          <button class="unit-btn" onclick="seleccionarUnidad('Suelo Pélvico')">Suelo Pélvico</button>
+          <button class="unit-btn" onclick="seleccionarUnidad('ATM')">ATM</button>
+          <button class="unit-btn col-span-2 md:col-span-1" onclick="seleccionarUnidad('TO')">TO</button>
         </div>
 
       </div>
